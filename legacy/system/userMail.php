@@ -48,7 +48,6 @@ $command = json_encode($data);
 curl_setopt($ch, CURLOPT_POSTFIELDS, $command);
 //set the content type to application/json
 curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
-curl_setopt($ch, CURLOPT_HTTPHEADER, array('Authorization: Bearer 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'));
 //return response instead of outputting
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 //set method

@@ -4,9 +4,6 @@ include '../system/session.php';
 include '../system/formQuery.php';
 require '../vendor/autoload.php';
 
-use Aws\S3\S3Client;
-use Aws\S3\Exception\S3Exception;
-
 $_SESSION['userLog']['module'] = "My Profile";
 
 if (($_GET['formStatus'] == 'create') or ($_GET['formStatus'] == 'edit')) {
