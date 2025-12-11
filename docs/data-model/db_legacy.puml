@@ -1,0 +1,347 @@
+@startuml HaomaiWMS_Legacy_DB
+
+' Configuración de estilo
+skinparam endpoint {
+  BackgroundColor White
+  BorderColor Black
+}
+
+' Tables from Dump20251211.sql
+
+entity "business" {
+  *id : int <<PK>>
+  --
+  businessName : varchar(1000)
+  legalName : varchar(1000)
+  logo : varchar(1000)
+  taxId : varchar(1000)
+  phone : varchar(1000)
+  whatsapp : varchar(1000)
+  wechat : varchar(1000)
+  webPage : varchar(1000)
+  email : varchar(1000)
+  address : varchar(1000)
+  postalCode : varchar(1000)
+  location : varchar(1000)
+  province : varchar(1000)
+  country : varchar(1000)
+  category : varchar(1000)
+  taxCondition : varchar(1000)
+  description : varchar(1000)
+  subscription : int
+  registrationDate : date
+}
+
+entity "customer" {
+  *my_row_id : bigint unsigned <<PK>>
+  --
+  id : int
+  companyId : int
+  code : int
+  businessName : text
+  legalName : text
+  logo : text
+  taxId : text
+  phone : text
+  email : text
+  address : text
+  postalCode : text
+  location : text
+  province : text
+  country : text
+  webPage : text
+  category : text
+  condition : text
+  creationDate : datetime
+  description : text
+  linkUserId : int
+  flagActive : bit(1)
+  whatsapp : text
+  wechat : text
+}
+
+entity "customers" {
+  *id : int <<PK>>
+  --
+  businessId : int
+  code : int
+  businessName : varchar(1000)
+  legalName : varchar(1000)
+  logo : varchar(1000)
+  taxId : varchar(1000)
+  phone : varchar(1000)
+  email : varchar(1000)
+  whatsapp : varchar(1000)
+  wechat : varchar(1000)
+  address : varchar(1000)
+  postalCode : varchar(1000)
+  location : varchar(1000)
+  province : varchar(1000)
+  country : varchar(1000)
+  webPage : varchar(1000)
+  category : varchar(1000)
+  taxCondition : varchar(1000)
+  creationDate : datetime
+  description : varchar(1000)
+  flagActive : bit(1)
+}
+
+entity "delivery" {
+  *id : int <<PK>>
+  --
+  businessId : int
+  userId : int
+  deliveryCode : int
+  datetime : datetime
+  description : varchar(1000)
+}
+
+entity "orderdetails" {
+  *id : int <<PK>>
+  --
+  orderId : int
+  productId : int
+  productSku : varchar(1000)
+  productName : varchar(1000)
+  productName2 : varchar(1000)
+  unitBarcode : varchar(1000)
+  image : varchar(1000)
+  newDueDate : date
+  dueDate : date
+  quantity : decimal(16,2)
+  oldQuantity : decimal(16,2)
+  pack : decimal(16,2)
+  currency : varchar(1000)
+  price : decimal(16,2)
+  oldPrice : decimal(16,2)
+  unit : varchar(1000)
+  capacity : decimal(16,2)
+  packBarcode : varchar(1000)
+}
+
+entity "orders" {
+  *id : int <<PK>>
+  --
+  businessId : int
+  requestId : int
+  date : date
+  time : time
+  userId : int
+  customerId : int
+  deliveryId : int
+  status : int
+  businessName : varchar(1000)
+  email : varchar(1000)
+  address : varchar(1000)
+  phone : varchar(1000)
+  taxId : varchar(1000)
+  location : varchar(1000)
+  postalCode : varchar(1000)
+  province : varchar(1000)
+  country : varchar(1000)
+  whatsapp : varchar(1000)
+  wechat : varchar(1000)
+  flagInOut : int
+  flagLogistic : int
+  flagStock : int
+  charge : decimal(16,2)
+  chargePercent : decimal(16,2)
+  discount : decimal(16,2)
+  discountPercent : decimal(16,2)
+  description : varchar(1000)
+  warehouseId : int
+}
+
+entity "products" {
+  *id : int <<PK>>
+  --
+  businessId : int
+  sku : varchar(1000)
+  code : varchar(1000)
+  name : varchar(1000)
+  name2 : varchar(1000)
+  subtitle : varchar(1000)
+  category : varchar(1000)
+  subcategory : varchar(1000)
+  brand : varchar(1000)
+  currency : varchar(1000)
+  priceRetail : decimal(16,2)
+  priceWholesale : decimal(16,2)
+  packWholesale : decimal(16,2)
+  capacity : decimal(16,2)
+  unit : varchar(1000)
+  stockCode : varchar(1000)
+  unitBarcode : varchar(1000)
+  packBarcode : varchar(1000)
+  purchasePrice : decimal(16,2)
+  creationDate : date
+  updateDate : date
+  dueDate : date
+  image : varchar(1000)
+  description : varchar(1000)
+  sortId : int
+  flagActive : bit(1)
+  flagMarket : bit(1)
+  flagGroup1 : bit(1)
+  flagGroup2 : bit(1)
+  flagGroup3 : bit(1)
+  marketLimit : decimal(16,2)
+  minStock : decimal(16,2)
+  lowStock : int
+  flagDiscontinued : bit(1)
+}
+
+entity "settings" {
+  *id : int <<PK>>
+  --
+  businessId : int
+  marketDisplay : int
+  facebook : varchar(1000)
+  instagram : varchar(1000)
+  twitter : varchar(1000)
+  carouselOne : varchar(1000)
+  carouselTwo : varchar(1000)
+  carouselThree : varchar(1000)
+  carouselFour : varchar(1000)
+  carouselFive : varchar(1000)
+  carouselSix : varchar(1000)
+  msgPreOrder : varchar(1000)
+  msgPostOrder : varchar(1000)
+  minOrder : decimal(16,2)
+  deliveryZone : varchar(1000)
+  languageId : int
+}
+
+entity "stocklogs" {
+  *id : int <<PK>>
+  --
+  requestId : int
+  date : datetime
+  stock : decimal(16,2)
+  type : int
+  businessId : int
+  warehouseId : int
+  productId : int
+  unitBarcode : varchar(1000)
+  userId : int
+  orderId : int
+  description : varchar(1000)
+}
+
+entity "tasks" {
+  *id : int <<PK>>
+  --
+  stock : decimal(16,2)
+  businessId : int
+  productId : int
+  unitBarcode : varchar(1000)
+  userId : int
+  description : varchar(1000)
+}
+
+entity "translations" {
+  *id : int <<PK>>
+  --
+  message : varchar(1000)
+  english : varchar(1000)
+  spanish : varchar(1000)
+  portuguese : varchar(1000)
+  chinese : varchar(1000)
+  japanese : varchar(1000)
+  korean : varchar(1000)
+}
+
+entity "userlogs" {
+  *id : int <<PK>>
+  --
+  userId : int
+  userLogDate : date
+  userLogTime : time
+  module : varchar(1000)
+  description : varchar(1000)
+}
+
+entity "users" {
+  *id : int <<PK>>
+  --
+  username : varchar(1000)
+  email : varchar(1000)
+  password : varchar(1000)
+  fullName : varchar(1000)
+  personalId : varchar(1000)
+  businessId : int
+  roleId : int
+  jobTitle : varchar(1000)
+  department : varchar(1000)
+  address : varchar(1000)
+  postalCode : varchar(1000)
+  location : varchar(1000)
+  province : varchar(1000)
+  country : varchar(1000)
+  phone : varchar(1000)
+  mobile : varchar(1000)
+  avatar : varchar(1000)
+  languageId : int
+  registrationDate : date
+  lastLogin : date
+  whatsapp : varchar(1000)
+  wechat : varchar(1000)
+  taxId : varchar(1000)
+  description : varchar(1000)
+  flagEmailChecked : bit(1)
+  flagResetPassword : bit(1)
+}
+
+entity "warehouse" {
+  *id : int <<PK>>
+  --
+  businessId : int
+  warehouseId : int
+  code : varchar(1000)
+  name : varchar(1000)
+  address : varchar(1000)
+  postalCode : varchar(1000)
+  location : varchar(1000)
+  province : varchar(1000)
+  country : varchar(1000)
+  description : varchar(1000)
+}
+
+' Inferred Relationships (Foreign Keys)
+
+' Explicit FK expected but only one found in SQL: warehouseId
+warehouse ||..o{ orders : "implicit FK"
+
+' Business references
+business ||..o{ customers : "implicit FK"
+business ||..o{ delivery : "implicit FK"
+business ||..o{ orders : "implicit FK"
+business ||..o{ products : "implicit FK"
+business ||..o{ settings : "implicit FK"
+business ||..o{ stocklogs : "implicit FK"
+business ||..o{ tasks : "implicit FK"
+business ||..o{ users : "implicit FK"
+business ||..o{ warehouse : "implicit FK"
+
+' Users references
+users ||..o{ delivery : "implicit FK"
+users ||..o{ orders : "implicit FK"
+users ||..o{ stocklogs : "implicit FK"
+users ||..o{ tasks : "implicit FK"
+users ||..o{ userlogs : "implicit FK"
+
+' Orders references
+customers ||..o{ orders : "implicit FK"
+delivery ||..o{ orders : "implicit FK"
+orders ||..o{ orderdetails : "implicit FK"
+orders ||..o{ stocklogs : "implicit FK"
+
+' Products references
+products ||..o{ orderdetails : "implicit FK"
+products ||..o{ stocklogs : "implicit FK"
+products ||..o{ tasks : "implicit FK"
+
+' Warehouse references
+warehouse ||..o{ stocklogs : "implicit FK"
+
+@enduml

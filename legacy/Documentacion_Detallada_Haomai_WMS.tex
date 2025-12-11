@@ -1,0 +1,110 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[spanish]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{enumitem}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+\title{Documentación detallada de funcionamiento interno de Haomai WMS}
+\author{}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\section*{1. Stack tecnológico y versiones}
+\begin{itemize}
+  \item \textbf{Lenguaje principal:} PHP 7.x/8.x
+  \item \textbf{Frontend:} HTML5, CSS3, JavaScript (jQuery)
+  \item \textbf{Frameworks/librerías:} Bootstrap, Toastr, FontAwesome, Ionicons
+  \item \textbf{Base de datos:} MySQL/MariaDB
+  \item \textbf{Contenedores:} Docker, Docker Compose
+  \item \textbf{Dependencias externas:}
+    \begin{itemize}
+      \item aws/aws-sdk-php (v2)
+      \item picqer/php-barcode-generator (\^2.4)
+    \end{itemize}
+\end{itemize}
+
+\section*{2. Estructura de carpetas y finalidad}
+\begin{itemize}[leftmargin=*, itemsep=0.5em]
+  \item \textbf{assets/} -- Recursos estáticos: CSS, JS, imágenes, fuentes.
+  \item \textbf{company/} -- Pantallas y lógica de gestión de empresas.
+  \item \textbf{logistic/} -- Módulo de logística: rutas, entregas, seguimiento.
+  \item \textbf{market/} -- Módulo de marketplace: productos, pedidos, órdenes, reportes.
+  \item \textbf{reports/} -- Generación y exportación de reportes (Excel, PDF).
+  \item \textbf{stock/} -- Gestión de inventario: productos, movimientos, tareas, depósitos.
+  \item \textbf{system/} -- Archivos de sistema: sesión, base de datos, utilidades.
+  \item \textbf{users/} -- Gestión de usuarios, roles y permisos.
+  \item \textbf{vendor/} -- Dependencias instaladas por Composer.
+  \item \textbf{webservice/} -- Endpoints y lógica de API interna.
+\end{itemize}
+
+\section*{3. Dockerización y despliegue}
+\subsection*{3.1. Archivos clave}
+\begin{itemize}
+  \item \textbf{docker-compose.yml:} Define los servicios (web, db) y sus redes/volúmenes.
+  \item \textbf{.env:} Variables de entorno para conexión a base de datos y configuración.
+\end{itemize}
+\subsection*{3.2. Pasos para levantar el sistema}
+\begin{enumerate}
+  \item Clonar el repositorio y ubicarse en la raíz del proyecto.
+  \item Configurar el archivo .env con los datos de la base de datos.
+  \item Ejecutar: \texttt{docker-compose up -d}
+  \item Acceder a la aplicación desde el navegador en la URL indicada (por defecto, http://localhost:8080)
+\end{enumerate}
+\subsection*{3.3. Consideraciones}
+\begin{itemize}
+  \item El contenedor web utiliza PHP y Apache.
+  \item El contenedor db utiliza MySQL/MariaDB y persiste datos en un volumen.
+  \item Para desarrollo, los cambios en archivos fuente se reflejan automáticamente.
+\end{itemize}
+
+\section*{4. Módulos y pantallas principales (según menú)}
+\subsection*{4.1. Pedidos}
+\begin{itemize}
+  \item \textbf{Pedidos:} Visualización y gestión de órdenes de ingreso/egreso.
+\end{itemize}
+\subsection*{4.2. Ingreso de Mercadería}
+\begin{itemize}
+  \item Permite registrar la entrada de productos, escanear códigos de barra, asignar depósito y lote, y definir fecha de vencimiento.
+\end{itemize}
+\subsection*{4.3. Egreso de Mercadería}
+\begin{itemize}
+  \item Permite registrar la salida de productos, seleccionar lote a egresar (si hay varios), y asociar el movimiento a un pedido o cliente.
+\end{itemize}
+\subsection*{4.4. Logística}
+\begin{itemize}
+  \item \textbf{Pedidos:} Listado de pedidos listos para entrega.
+  \item \textbf{Entrega:} Gestión y seguimiento de entregas a clientes o sucursales.
+\end{itemize}
+\subsection*{4.5. Depósito}
+\begin{itemize}
+  \item \textbf{Lista de productos:} Catálogo de productos en stock.
+  \item \textbf{Disponibilidad:} Consulta de stock por producto y ubicación.
+  \item \textbf{Registros:} Historial de movimientos de inventario.
+  \item \textbf{Ubicación:} Gestión de ubicaciones físicas dentro del depósito.
+\end{itemize}
+\subsection*{4.6. Clientes}
+\begin{itemize}
+  \item \textbf{Listado de Clientes:} ABM de clientes y consulta de historial de pedidos/entregas.
+\end{itemize}
+\subsection*{4.7. Reporte}
+\begin{itemize}
+  \item \textbf{Por categoría:} Reporte de stock agrupado por familia de productos.
+  \item \textbf{Fecha de Vencimiento:} Listado de productos próximos a vencer.
+  \item \textbf{Caducado:} Productos vencidos en stock.
+  \item \textbf{Alerta de inventario:} Productos con stock bajo.
+  \item \textbf{Reporte de movimiento de stock:} Historial detallado de ingresos, egresos y ajustes.
+\end{itemize}
+
+\section*{5. Resumen de utilidad de cada sección}
+\begin{itemize}[leftmargin=*, itemsep=0.5em]
+  \item \textbf{Pedidos:} Centraliza la gestión de órdenes y su estado.
+  \item \textbf{Ingreso/Egreso:} Mantiene actualizado el stock y asegura trazabilidad.
+  \item \textbf{Logística:} Permite planificar y controlar entregas.
+  \item \textbf{Depósito:} Brinda visibilidad y control sobre el inventario físico.
+  \item \textbf{Clientes:} Facilita la gestión comercial y la trazabilidad de entregas.
+  \item \textbf{Reportes:} Provee información clave para la toma de decisiones y auditoría.
+\end{itemize}
+
+\end{document} 

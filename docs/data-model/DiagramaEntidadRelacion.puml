@@ -1,0 +1,175 @@
+@startuml HaomaiWMS_ER_Diagram
+
+' Configuración de estilo
+skinparam endpoint {
+  BackgroundColor White
+  BorderColor Black
+}
+
+' Entidades Principales
+
+entity "products" as products {
+  *id : INT <<PK>>
+  --
+  sku : VARCHAR
+  unitBarcode : VARCHAR
+  name : VARCHAR
+  category : VARCHAR
+  capacity : VARCHAR
+  unit : VARCHAR
+  brand : VARCHAR
+  packWholesale : INT
+  description : TEXT
+  image : VARCHAR
+  dueDate : DATE
+  flagDiscontinued : BOOLEAN
+  flagActive : BOOLEAN
+  businessId : INT
+}
+
+entity "warehouse" as warehouse {
+  *id : INT <<PK>>
+  --
+  name : VARCHAR
+  businessId : INT
+}
+
+' Nuevo esquema de Stock (Snapshot)
+entity "inventory" as inventory {
+  *id : INT <<PK>>
+  --
+  lotNumber : VARCHAR
+  expiryDate : DATE
+  quantity : DECIMAL
+  --
+  *warehouseId : INT <<FK>>
+  *productId : INT <<FK>>
+}
+
+' Nuevo esquema de Movimientos (Log/Ledger)
+entity "stock_movements" as stock_movements {
+  *id : INT <<PK>>
+  --
+  date : DATETIME
+  type : VARCHAR (IN, OUT, ADJUST)
+  quantityDelta : DECIMAL
+  description : TEXT
+  lotNumber : VARCHAR
+  --
+  *warehouseId : INT <<FK>>
+  *productId : INT <<FK>>
+  *userId : INT <<FK>>
+  *orderId : INT <<FK>>
+}
+
+entity "orders" as orders {
+  *id : INT <<PK>>
+  --
+  requestId : INT
+  date : DATE
+  time : TIME
+  status : VARCHAR
+  flagInOut : BOOLEAN (0=Ingreso, 1=Egreso)
+  businessId : INT
+  --
+  *userId : INT <<FK>>
+}
+
+entity "ingresos" as ingresos {
+  *id : INT <<PK>>
+  --
+  *orderId : INT <<FK>>
+  *supplierId : INT <<FK>>
+}
+
+entity "egresos" as egresos {
+  *id : INT <<PK>>
+  --
+  *orderId : INT <<FK>>
+  *customerId : INT <<FK>>
+}
+
+entity "orderDetails" as orderDetails {
+  *id : INT <<PK>>
+  --
+  quantity : DECIMAL
+  pack : INT
+  itemPrice : DECIMAL
+  productName : VARCHAR
+  productSku : VARCHAR
+  --
+  *orderId : INT <<FK>>
+  *productId : INT <<FK>>
+}
+
+entity "suppliers" as suppliers {
+  *id : INT <<PK>>
+  --
+  businessName : VARCHAR
+  taxId : VARCHAR
+  address : VARCHAR
+  phone : VARCHAR
+  email : VARCHAR
+  businessId : INT
+}
+
+entity "customers" as customers {
+  *id : INT <<PK>>
+  --
+  businessName : VARCHAR
+  taxId : VARCHAR
+  address : VARCHAR
+  phone : VARCHAR
+  email : VARCHAR
+  businessId : INT
+}
+
+entity "users" as users {
+  *id : INT <<PK>>
+  --
+  fullName : VARCHAR
+  email : VARCHAR
+  roleId : INT
+  avatar : VARCHAR
+  businessId : INT
+}
+
+entity "userLog" as userLog {
+  *id : INT <<PK>>
+  --
+  userLogDate : DATE
+  userLogTime : TIME
+  module : VARCHAR
+  description : TEXT
+  --
+  *userId : INT <<FK>>
+}
+
+' Relaciones
+
+' Stock Snapshot
+warehouse ||..o{ inventory : "almacena"
+products ||..o{ inventory : "tiene stock en"
+
+' Stock Movimientos
+warehouse ||..o{ stock_movements : "registra historial en"
+products ||..o{ stock_movements : "tiene historial de"
+users ||..o{ stock_movements : "ejecuta movimiento"
+orders ||..o{ stock_movements : "genera movimiento"
+
+' Pedidos Generales
+orders ||..o{ orderDetails : "contiene"
+products ||..o{ orderDetails : "listado en"
+users ||..o{ orders : "crea/gestiona"
+
+' Desglose de Pedidos (Ingresos vs Egresos)
+orders ||--|| ingresos : "es un"
+orders ||--|| egresos : "es un"
+
+ingresos }o..|| suppliers : "proveído por"
+egresos }o..|| customers : "destinado a"
+
+' Auditoría
+users ||..o{ userLog : "tiene actividad"
+
+@enduml

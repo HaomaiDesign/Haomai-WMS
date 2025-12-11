@@ -1,0 +1,42 @@
+img {
+    width: 100%;
+    /* max-width: 100%;   */
+} 
+@media only screen and (max-width: 500px) {
+    .text-center {
+        font-size: 1rem;
+    }
+
+    img {
+        width: 18rem !important;
+        max-width: 20rem !important;  
+    } 
+    .table-sm th, .table-sm td {
+        padding: 2rem;
+    }
+
+    .table {
+        font-size: 1rem;
+    }
+    .table th, .text-wrap table th, .table td, .text-wrap table td {
+        padding: 20px;
+        width: 30rem;
+        /* max-width: 50rem;  */
+    }
+
+    element.style {
+        font-size: 2rem;
+    }
+
+    /*Cambio sobre header en mobile*/
+    .card-header{
+        display: flex;
+        flex-direction: column;
+        /* align-items:flex-start */
+    }
+    .card-header-mobile{
+        align-items:flex-start 
+    }
+
+
+}
