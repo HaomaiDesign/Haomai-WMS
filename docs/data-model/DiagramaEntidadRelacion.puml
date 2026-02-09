@@ -8,11 +8,34 @@ skinparam endpoint {
 
 ' Entidades Principales
 
+entity "business" as business {
+  *id : INT <<PK>>
+  --
+  businessName : VARCHAR
+  legalName : VARCHAR
+  logo : VARCHAR
+  taxId : VARCHAR
+  phone : VARCHAR
+  whatsapp : VARCHAR
+  wechat : VARCHAR
+  webPage : VARCHAR
+  email : VARCHAR
+  address : VARCHAR
+  postalCode : VARCHAR
+  location : VARCHAR
+  province : VARCHAR
+  country : VARCHAR
+  category : VARCHAR
+  taxCondition : VARCHAR
+  description : TEXT
+  subscription : INT
+  registrationDate : DATE
+}
+
 entity "products" as products {
   *id : INT <<PK>>
   --
   sku : VARCHAR
-  unitBarcode : VARCHAR
   name : VARCHAR
   category : VARCHAR
   capacity : VARCHAR
@@ -24,42 +47,80 @@ entity "products" as products {
   dueDate : DATE
   flagDiscontinued : BOOLEAN
   flagActive : BOOLEAN
-  businessId : INT
+  --
+  *businessId : INT <<FK>>
 }
 
 entity "warehouse" as warehouse {
   *id : INT <<PK>>
   --
   name : VARCHAR
-  businessId : INT
+  --
+  *businessId : INT <<FK>>
 }
 
-' Nuevo esquema de Stock (Snapshot)
-entity "inventory" as inventory {
+' Lotes de Productos
+entity "lots" as lots {
   *id : INT <<PK>>
   --
-  lotNumber : VARCHAR
   expiryDate : DATE
-  quantity : DECIMAL
+  receivedDate : DATE
+  status : VARCHAR (PENDING, RECEIVED, EXPIRED)
+  createdAt : DATETIME
   --
+  *productId : INT <<FK>>
   *warehouseId : INT <<FK>>
+}
+
+' Múltiples Barcodes por Producto
+entity "product_barcodes" as product_barcodes {
+  *id : INT <<PK>>
+  --
+  barcode : VARCHAR (UNIQUE)
+  type : VARCHAR (UNIT, PACK)
+  isPrimary : BOOLEAN
+  createdAt : DATETIME
+  --
   *productId : INT <<FK>>
 }
 
-' Nuevo esquema de Movimientos (Log/Ledger)
-entity "stock_movements" as stock_movements {
+' Relación N:M entre Pack Barcodes y Unit Barcodes
+entity "barcode_pack_contents" as barcode_pack_contents {
   *id : INT <<PK>>
+  --
+  quantity : INT
+  --
+  *packBarcodeId : INT <<FK>>
+  *unitBarcodeId : INT <<FK>>
+}
+
+' Snapshot de Stock (Vista Materializada)
+entity "stockSnapshot" as stockSnapshot {
+  *id : INT <<PK>>
+  --
+  quantity : DECIMAL
+  lastMovementId : BIGINT
+  updatedAt : DATETIME
+  --
+  *productId : INT <<FK>>
+  *warehouseId : INT <<FK>>
+  *lotId : INT <<FK>>
+}
+
+' Historial de Movimientos (Source of Truth)
+entity "stockLogs" as stockLogs {
+  *id : BIGINT <<PK>>
   --
   date : DATETIME
-  type : VARCHAR (IN, OUT, ADJUST)
+  type : VARCHAR (IN, OUT, ADJUST, TRANSFER)
   quantityDelta : DECIMAL
   description : TEXT
-  lotNumber : VARCHAR
   --
-  *warehouseId : INT <<FK>>
   *productId : INT <<FK>>
+  *warehouseId : INT <<FK>>
+  *lotId : INT <<FK>>
   *userId : INT <<FK>>
-  *orderId : INT <<FK>>
+  orderId : INT <<FK>>
 }
 
 entity "orders" as orders {
@@ -70,19 +131,19 @@ entity "orders" as orders {
   time : TIME
   status : VARCHAR
   flagInOut : BOOLEAN (0=Ingreso, 1=Egreso)
-  businessId : INT
   --
+  *businessId : INT <<FK>>
   *userId : INT <<FK>>
 }
 
-entity "ingresos" as ingresos {
+entity "inbound_orders" as inbound_orders {
   *id : INT <<PK>>
   --
   *orderId : INT <<FK>>
   *supplierId : INT <<FK>>
 }
 
-entity "egresos" as egresos {
+entity "outbound_orders" as outbound_orders {
   *id : INT <<PK>>
   --
   *orderId : INT <<FK>>
@@ -100,6 +161,7 @@ entity "orderDetails" as orderDetails {
   --
   *orderId : INT <<FK>>
   *productId : INT <<FK>>
+  *lotId : INT <<FK>>
 }
 
 entity "suppliers" as suppliers {
@@ -110,7 +172,8 @@ entity "suppliers" as suppliers {
   address : VARCHAR
   phone : VARCHAR
   email : VARCHAR
-  businessId : INT
+  --
+  *businessId : INT <<FK>>
 }
 
 entity "customers" as customers {
@@ -121,7 +184,8 @@ entity "customers" as customers {
   address : VARCHAR
   phone : VARCHAR
   email : VARCHAR
-  businessId : INT
+  --
+  *businessId : INT <<FK>>
 }
 
 entity "users" as users {
@@ -129,9 +193,10 @@ entity "users" as users {
   --
   fullName : VARCHAR
   email : VARCHAR
-  roleId : INT
+  role : VARCHAR (SUPER_ADMIN, ADMIN, REPOSITOR)
   avatar : VARCHAR
-  businessId : INT
+  --
+  *businessId : INT <<FK>>
 }
 
 entity "userLog" as userLog {
@@ -145,17 +210,49 @@ entity "userLog" as userLog {
   *userId : INT <<FK>>
 }
 
-' Relaciones
+entity "translations" as translations {
+  *id : INT <<PK>>
+  --
+  message : VARCHAR
+  english : VARCHAR
+  spanish : VARCHAR
+  portuguese : VARCHAR
+  chinese : VARCHAR
+  japanese : VARCHAR
+  korean : VARCHAR
+}
+
+' Relaciones con Business (empresa/organización)
+business ||..o{ users : "tiene empleados"
+business ||..o{ products : "gestiona productos"
+business ||..o{ warehouse : "posee almacenes"
+business ||..o{ orders : "genera pedidos"
+business ||..o{ suppliers : "tiene proveedores"
+business ||..o{ customers : "tiene clientes"
+
+' Lotes
+products ||..o{ lots : "tiene lotes"
+warehouse ||..o{ lots : "almacena lotes"
+
+' Barcodes
+products ||..o{ product_barcodes : "tiene barcodes"
+product_barcodes ||..o{ barcode_pack_contents : "pack contiene"
+product_barcodes ||..o{ barcode_pack_contents : "unit incluido en"
 
 ' Stock Snapshot
-warehouse ||..o{ inventory : "almacena"
-products ||..o{ inventory : "tiene stock en"
+lots ||..o{ stockSnapshot : "tiene snapshot"
+warehouse ||..o{ stockSnapshot : "almacena"
+products ||..o{ stockSnapshot : "tiene stock en"
 
-' Stock Movimientos
-warehouse ||..o{ stock_movements : "registra historial en"
-products ||..o{ stock_movements : "tiene historial de"
-users ||..o{ stock_movements : "ejecuta movimiento"
-orders ||..o{ stock_movements : "genera movimiento"
+' Stock Logs (Source of Truth)
+lots ||..o{ stockLogs : "registra en"
+warehouse ||..o{ stockLogs : "registra historial en"
+products ||..o{ stockLogs : "tiene historial de"
+users ||..o{ stockLogs : "ejecuta movimiento"
+orders ||..o{ stockLogs : "genera movimiento"
+
+' Order Details con Lote
+lots ||..o{ orderDetails : "usado en"
 
 ' Pedidos Generales
 orders ||..o{ orderDetails : "contiene"
@@ -163,13 +260,14 @@ products ||..o{ orderDetails : "listado en"
 users ||..o{ orders : "crea/gestiona"
 
 ' Desglose de Pedidos (Ingresos vs Egresos)
-orders ||--|| ingresos : "es un"
-orders ||--|| egresos : "es un"
+orders ||--|| inbound_orders : "es un"
+orders ||--|| outbound_orders : "es un"
 
-ingresos }o..|| suppliers : "proveído por"
-egresos }o..|| customers : "destinado a"
+inbound_orders }o..|| suppliers : "proveído por"
+outbound_orders }o..|| customers : "destinado a"
 
 ' Auditoría
 users ||..o{ userLog : "tiene actividad"
 
 @enduml
+
