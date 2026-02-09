@@ -1,0 +1,74 @@
+services:
+  # SQL Server Database
+  database:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: haomai_wms_db
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=HaomaiWMS2024!
+      - MSSQL_PID=Developer
+    ports:
+      - "1433:1433"
+    volumes:
+      - ./sql_init:/docker-entrypoint-initdb.d
+      - mssql_data:/var/opt/mssql
+    networks:
+      - haomai_network
+    healthcheck:
+      test: /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P HaomaiWMS2024! -Q "SELECT 1" || exit 1
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+
+  # Backend API (NestJS)
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    container_name: haomai_wms_api
+    environment:
+      - NODE_ENV=development
+      - DATABASE_HOST=database
+      - DATABASE_PORT=1433
+      - DATABASE_USER=sa
+      - DATABASE_PASSWORD=HaomaiWMS2024!
+      - DATABASE_NAME=haomai_wms
+      - PORT=3001
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./api/src:/app/src
+      - ./api/test:/app/test
+    depends_on:
+      database:
+        condition: service_healthy
+    networks:
+      - haomai_network
+    command: pnpm run start:dev
+
+  # Frontend Web (Next.js)
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    container_name: haomai_wms_web
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_API_URL=http://localhost:3001
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./web/src:/app/src
+      - ./web/public:/app/public
+    networks:
+      - haomai_network
+    command: npm run dev
+
+volumes:
+  mssql_data:
+    driver: local
+
+networks:
+  haomai_network:
+    driver: bridge
