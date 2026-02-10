@@ -309,8 +309,8 @@ CREATE TYPE dbo.EgresoItemType AS TABLE (
 
 ### 6.2 SP de Egreso
 ```sql
-CREATE PROCEDURE dbo.sp_ProcesarEgreso
-    @businessId INT,
+    -- businessId deleted
+    CREATE PROCEDURE dbo.sp_ProcesarEgreso
     @userId INT,
     @customerId INT,
     @warehouseId INT,
@@ -384,7 +384,6 @@ GROUP BY p.id, p.name;
 SELECT p.id, p.name, SUM(i.quantity) AS stock_total
 FROM products p
 JOIN stockSnapshot i ON i.productId = p.id
-WHERE p.businessId = @businessId
 GROUP BY p.id, p.name;
 ```
 

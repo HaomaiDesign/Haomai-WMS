@@ -12,7 +12,101 @@ GO
 -- INSERT INTO dbo.businesses (name, ...) VALUES ('Client Company', ...);
 
 -- ============================================
--- SECTION: Warehouse Locations
+-- SECTION: System Users (Moved from 01 and 03)
+-- ============================================
+
+-- 1. Super Admin
+IF NOT EXISTS (
+    SELECT 1
+    FROM dbo.users
+    WHERE
+        username = 'superadmin'
+) BEGIN
+INSERT INTO
+    dbo.users (
+        id,
+        username,
+        email,
+        password,
+        full_name,
+        role_id,
+        role_type
+    )
+VALUES (
+        NEWID(),
+        'superadmin',
+        'superadmin@haomai.com',
+        '$2b$10$ZrWWwW0G3najeXoAZnBh/OAnhg/Z6.H2OZjJK1j98IjXtrqflVW7C', -- S4DMHaomai!
+        'Super Administrator',
+        1,
+        'SUPER_ADMIN'
+    );
+
+PRINT 'User superadmin created';
+
+END
+
+-- 2. Admin
+IF NOT EXISTS (
+    SELECT 1
+    FROM dbo.users
+    WHERE
+        username = 'admin'
+) BEGIN
+INSERT INTO
+    dbo.users (
+        id,
+        username,
+        email,
+        password,
+        full_name,
+        role_id,
+        role_type
+    )
+VALUES (
+        NEWID(),
+        'admin',
+        'admin@haomai.com',
+        '$2b$10$vhD2lOkAwgcT38dSm/HToeeR3LCLlKxUn1Uor/zErTc7T/pLlcTLG', -- admin123 (hashed)
+        'Administrator',
+        1,
+        'ADMIN'
+    );
+
+PRINT 'User admin created';
+
+END
+
+-- 3. Employee
+IF NOT EXISTS (
+    SELECT 1
+    FROM dbo.users
+    WHERE
+        username = 'employee'
+) BEGIN
+INSERT INTO
+    dbo.users (
+        id,
+        username,
+        email,
+        password,
+        full_name,
+        role_id,
+        role_type
+    )
+VALUES (
+        NEWID(),
+        'employee',
+        'employee@haomai.com',
+        '$2b$10$9L.ZC4sGQ2uiq4boZUKONe96tygh4ZvE3vOPIQ8VLdxaNTwbim9Ae', -- employee123 (hashed)
+        'Employee User',
+        2,
+        'REPOSITOR'
+    );
+
+PRINT 'User employee created';
+
+END
 -- ============================================
 -- Add warehouse location records here
 -- Example:

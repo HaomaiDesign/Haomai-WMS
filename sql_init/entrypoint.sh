@@ -20,9 +20,10 @@ echo "Running SQL initialization scripts..."
 for file in /docker-entrypoint-initdb.d/*.sql; do
     if [ -f "$file" ]; then
         echo "Executing $file ..."
-        /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "$SA_PASSWORD" -C -i "$file"
+        /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "$SA_PASSWORD" -C -i "$file" -b
         if [ $? -ne 0 ]; then
             echo "ERROR: Failed to execute $file"
+            exit 1
         else
             echo "SUCCESS: $file executed"
         fi

@@ -1,5 +1,5 @@
 -- SQL Server migration script for Haomai WMS
--- Migration: 06_create_wms_model.sql
+-- Migration: 04_create_wms_model.sql
 -- Creates all core WMS tables with proper FK ordering
 
 USE haomai_wms;
@@ -12,13 +12,9 @@ IF OBJECT_ID('dbo.warehouse', 'U') IS NULL BEGIN
 CREATE TABLE dbo.warehouse (
     id INT IDENTITY(1, 1) PRIMARY KEY,
     name NVARCHAR(500) NOT NULL,
-    business_id INT NOT NULL,
     created_at DATETIME2 DEFAULT GETDATE(),
     updated_at DATETIME2 DEFAULT GETDATE(),
-    CONSTRAINT FK_warehouse_business FOREIGN KEY (business_id) REFERENCES dbo.business (id)
 );
-
-CREATE INDEX idx_warehouse_business ON dbo.warehouse (business_id);
 
 PRINT 'Table dbo.warehouse created successfully';
 
@@ -43,13 +39,9 @@ CREATE TABLE dbo.products (
     due_date DATE NULL,
     flag_discontinued BIT DEFAULT 0,
     flag_active BIT DEFAULT 1,
-    business_id INT NOT NULL,
     created_at DATETIME2 DEFAULT GETDATE(),
     updated_at DATETIME2 DEFAULT GETDATE(),
-    CONSTRAINT FK_products_business FOREIGN KEY (business_id) REFERENCES dbo.business (id)
 );
-
-CREATE INDEX idx_products_business ON dbo.products (business_id);
 
 CREATE INDEX idx_products_sku ON dbo.products (sku);
 
@@ -71,13 +63,9 @@ CREATE TABLE dbo.suppliers (
     address NVARCHAR(1000) NULL,
     phone NVARCHAR(1000) NULL,
     email NVARCHAR(1000) NULL,
-    business_id INT NOT NULL,
     created_at DATETIME2 DEFAULT GETDATE(),
     updated_at DATETIME2 DEFAULT GETDATE(),
-    CONSTRAINT FK_suppliers_business FOREIGN KEY (business_id) REFERENCES dbo.business (id)
 );
-
-CREATE INDEX idx_suppliers_business ON dbo.suppliers (business_id);
 
 PRINT 'Table dbo.suppliers created successfully';
 
@@ -95,13 +83,9 @@ CREATE TABLE dbo.customers (
     address NVARCHAR(1000) NULL,
     phone NVARCHAR(1000) NULL,
     email NVARCHAR(1000) NULL,
-    business_id INT NOT NULL,
     created_at DATETIME2 DEFAULT GETDATE(),
     updated_at DATETIME2 DEFAULT GETDATE(),
-    CONSTRAINT FK_customers_business FOREIGN KEY (business_id) REFERENCES dbo.business (id)
 );
-
-CREATE INDEX idx_customers_business ON dbo.customers (business_id);
 
 PRINT 'Table dbo.customers created successfully';
 
@@ -214,15 +198,11 @@ CREATE TABLE dbo.orders (
         )
     ),
     flag_in_out BIT NOT NULL, -- 0 = Inbound, 1 = Outbound
-    business_id INT NOT NULL,
-    user_id INT NOT NULL,
+    user_id UNIQUEIDENTIFIER NOT NULL,
     created_at DATETIME2 DEFAULT GETDATE(),
     updated_at DATETIME2 DEFAULT GETDATE(),
-    CONSTRAINT FK_orders_business FOREIGN KEY (business_id) REFERENCES dbo.business (id),
     CONSTRAINT FK_orders_user FOREIGN KEY (user_id) REFERENCES dbo.users (id)
 );
-
-CREATE INDEX idx_orders_business ON dbo.orders (business_id);
 
 CREATE INDEX idx_orders_user ON dbo.orders (user_id);
 
@@ -250,7 +230,8 @@ CREATE TABLE dbo.inbound_orders (
 
 CREATE INDEX idx_inbound_order ON dbo.inbound_orders (order_id);
 
-CREATE INDEX idx_inbound_supplier ON dbo.inbound_orders (supplier_id);
+CREATE
+INDEX idx_inbound_supplier ON dbo.inbound_orders (supplier_id);
 
 PRINT 'Table dbo.inbound_orders created successfully';
 
@@ -365,7 +346,7 @@ CREATE TABLE dbo.stock_logs (
     ),
     quantity_delta DECIMAL(16, 2) NOT NULL,
     description NVARCHAR(500) NULL,
-    user_id INT NOT NULL,
+    user_id UNIQUEIDENTIFIER NOT NULL,
     order_id INT NULL,
     created_at DATETIME2 DEFAULT GETDATE(),
     CONSTRAINT FK_stock_logs_product FOREIGN KEY (product_id) REFERENCES dbo.products (id),
@@ -395,6 +376,6 @@ GO
 
 PRINT '============================================';
 
-PRINT 'Migration 06_create_wms_model completed successfully';
+PRINT 'Migration 04_create_wms_model completed successfully';
 
 PRINT '============================================';

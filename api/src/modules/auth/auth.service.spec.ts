@@ -14,37 +14,14 @@ describe('AuthService', () => {
     let usersService: UsersService;
     let jwtService: JwtService;
 
-    const mockUser: User = {
-        id: 1,
+    const mockUser: any = {
+        id: '123e4567-e89b-12d3-a456-426614174000',
         username: 'testuser',
         email: 'test@example.com',
         password: '$2b$10$hashedpassword', // bcrypt hash
-        role: UserRole.ADMIN,
-        fullName: 'Test User',
-        personalId: null,
-        businessId: 1,
-        roleId: 1,
-        jobTitle: null,
-        department: null,
-        address: null,
-        postalCode: null,
-        location: null,
-        province: null,
-        country: null,
-        phone: null,
-        mobile: null,
-        avatar: null,
-        languageId: null,
-        registrationDate: null,
-        lastLogin: null,
-        whatsapp: null,
-        wechat: null,
-        taxId: null,
-        description: null,
-        flagEmailChecked: false,
-        flagResetPassword: false,
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        roleType: UserRole.ADMIN,
+        // ... other properties with nulls are fine if we cast to any or User (if User allowed nulls)
+        // treating as any to bypass strict checks for this mock in test
     };
 
     const mockUsersService = {
@@ -91,7 +68,7 @@ describe('AuthService', () => {
             expect(result).toBeDefined();
             expect(result.id).toBe(mockUser.id);
             expect(result.username).toBe(mockUser.username);
-            expect(result.password).toBeUndefined(); // Password should not be included
+            expect((result as any).password).toBeUndefined(); // Cast to any to check undefined
             expect(mockUsersService.findByUsername).toHaveBeenCalledWith('testuser');
         });
 
@@ -106,7 +83,7 @@ describe('AuthService', () => {
             expect(result).toBeDefined();
             expect(result.id).toBe(mockUser.id);
             expect(result.email).toBe(mockUser.email);
-            expect(result.password).toBeUndefined();
+            expect((result as any).password).toBeUndefined();
             expect(mockUsersService.findByEmail).toHaveBeenCalledWith('test@example.com');
         });
 
@@ -136,14 +113,16 @@ describe('AuthService', () => {
 
             const result = await service.login(mockUser);
 
+            const { password, ...userWithoutPassword } = mockUser;
             expect(result).toEqual({
                 access_token: mockToken,
                 role: UserRole.ADMIN,
+                user: userWithoutPassword,
             });
             expect(mockJwtService.sign).toHaveBeenCalledWith({
                 sub: mockUser.id,
                 username: mockUser.username,
-                role: mockUser.role,
+                role: mockUser.roleType,
             });
         });
     });

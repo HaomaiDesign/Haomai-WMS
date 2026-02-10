@@ -20,7 +20,7 @@ export class UsersService {
     return this.usersRepository.find();
   }
 
-  findOne(id: number) {
+  async findOne(id: string): Promise<User | null> {
     return this.usersRepository.findOne({ where: { id } });
   }
 
@@ -32,9 +32,8 @@ export class UsersService {
         'username',
         'email',
         'password', // Include password for auth validation
-        'role',
+        'roleType',
         'fullName',
-        'businessId',
       ],
     });
   }
@@ -47,18 +46,17 @@ export class UsersService {
         'username',
         'email',
         'password', // Include password for auth validation
-        'role',
+        'roleType',
         'fullName',
-        'businessId',
       ],
     });
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
+  update(id: string, updateUserDto: UpdateUserDto) {
     return `This action updates a #${id} user`;
   }
 
-  remove(id: number) {
+  remove(id: string) {
     return `This action removes a #${id} user`;
   }
 }

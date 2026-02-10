@@ -6,11 +6,12 @@ import {
     UpdateDateColumn,
 } from 'typeorm';
 import { UserRole } from '../enums/user-role.enum';
+// Business import removed
 
 @Entity('users')
 export class User {
-    @PrimaryGeneratedColumn()
-    id: number;
+    @PrimaryGeneratedColumn('uuid')
+    id: string; // Changed from number to string
 
     @Column({ type: 'nvarchar', length: 1000, nullable: true })
     username: string;
@@ -32,19 +33,19 @@ export class User {
     })
     personalId: string;
 
-    @Column({ name: 'business_id', type: 'int', nullable: true })
-    businessId: number;
+    // businessId removed
 
     @Column({ name: 'role_id', type: 'int', nullable: true })
     roleId: number;
 
     @Column({
+        name: 'role_type',
         type: 'nvarchar',
         length: 50,
         nullable: false,
         default: UserRole.REPOSITOR,
     })
-    role: UserRole;
+    roleType: UserRole;
 
     @Column({ name: 'job_title', type: 'nvarchar', length: 1000, nullable: true })
     jobTitle: string;
@@ -123,4 +124,5 @@ export class User {
 
     @UpdateDateColumn({ name: 'updated_at', type: 'datetime2' })
     updatedAt: Date;
+
 }

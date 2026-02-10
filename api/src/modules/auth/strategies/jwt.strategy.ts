@@ -5,7 +5,7 @@ import { ConfigService } from '@nestjs/config';
 import { UserRole } from '../../users/enums/user-role.enum';
 
 export interface JwtPayload {
-    sub: number; // user id
+    sub: string; // user id
     username: string;
     role: UserRole;
 }

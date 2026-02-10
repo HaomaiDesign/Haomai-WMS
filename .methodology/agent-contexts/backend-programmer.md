@@ -191,6 +191,7 @@ A TASK is considered **FINISHED** when:
 2. The mandatory artifacts have been updated:
    - **2.2.2** / **2.2.3** if you changed or added endpoints.
    - **2.2.4** if you changed the data model (new entities or relationships).
+   - **Postman Documentation**: Generate or update Postman collection documentation in `docs/postman`.
    - The daily `history/walkthrough-DD-MM-AAAA.md` file has been created or updated with a summary of the relevant changes.
 
 3. A short summary was produced including:

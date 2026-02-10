@@ -8,29 +8,7 @@ skinparam endpoint {
 
 ' Entidades Principales
 
-entity "business" as business {
-  *id : INT <<PK>>
-  --
-  businessName : VARCHAR
-  legalName : VARCHAR
-  logo : VARCHAR
-  taxId : VARCHAR
-  phone : VARCHAR
-  whatsapp : VARCHAR
-  wechat : VARCHAR
-  webPage : VARCHAR
-  email : VARCHAR
-  address : VARCHAR
-  postalCode : VARCHAR
-  location : VARCHAR
-  province : VARCHAR
-  country : VARCHAR
-  category : VARCHAR
-  taxCondition : VARCHAR
-  description : TEXT
-  subscription : INT
-  registrationDate : DATE
-}
+
 
 entity "products" as products {
   *id : INT <<PK>>
@@ -48,7 +26,7 @@ entity "products" as products {
   flagDiscontinued : BOOLEAN
   flagActive : BOOLEAN
   --
-  *businessId : INT <<FK>>
+  *businessId : UUID <<FK>>
 }
 
 entity "warehouse" as warehouse {
@@ -56,7 +34,7 @@ entity "warehouse" as warehouse {
   --
   name : VARCHAR
   --
-  *businessId : INT <<FK>>
+
 }
 
 ' Lotes de Productos
@@ -132,7 +110,7 @@ entity "orders" as orders {
   status : VARCHAR
   flagInOut : BOOLEAN (0=Ingreso, 1=Egreso)
   --
-  *businessId : INT <<FK>>
+
   *userId : INT <<FK>>
 }
 
@@ -173,7 +151,7 @@ entity "suppliers" as suppliers {
   phone : VARCHAR
   email : VARCHAR
   --
-  *businessId : INT <<FK>>
+
 }
 
 entity "customers" as customers {
@@ -185,7 +163,7 @@ entity "customers" as customers {
   phone : VARCHAR
   email : VARCHAR
   --
-  *businessId : INT <<FK>>
+
 }
 
 entity "users" as users {
@@ -196,7 +174,7 @@ entity "users" as users {
   role : VARCHAR (SUPER_ADMIN, ADMIN, REPOSITOR)
   avatar : VARCHAR
   --
-  *businessId : INT <<FK>>
+
 }
 
 entity "userLog" as userLog {
@@ -222,13 +200,7 @@ entity "translations" as translations {
   korean : VARCHAR
 }
 
-' Relaciones con Business (empresa/organización)
-business ||..o{ users : "tiene empleados"
-business ||..o{ products : "gestiona productos"
-business ||..o{ warehouse : "posee almacenes"
-business ||..o{ orders : "genera pedidos"
-business ||..o{ suppliers : "tiene proveedores"
-business ||..o{ customers : "tiene clientes"
+
 
 ' Lotes
 products ||..o{ lots : "tiene lotes"
