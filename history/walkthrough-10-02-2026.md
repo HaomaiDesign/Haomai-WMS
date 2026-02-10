@@ -61,3 +61,61 @@ Solución de conflictos de nombre de columna (`role`), reordenamiento de migraci
 - **Auth**: Passport, JWT Strategy
 - **Base de Datos**: SQL Server
 - **Testing**: Jest (Unit & E2E)
+
+---
+
+## Parte 3: Implementación de AUTH-002 (Registro de Usuarios)
+
+### Cambios Principales
+
+#### DTOs Creados
+- [`CreateUserDto`](file:///Users/nicogarofalo/Documents/Haomai/Haomai-WMS/api/src/modules/users/dto/create-user.dto.ts): Validación con `class-validator` (username, email, password, fullName, roleType).
+- [`RegisterDto`](file:///Users/nicogarofalo/Documents/Haomai/Haomai-WMS/api/src/modules/auth/dto/register.dto.ts): Extiende `CreateUserDto`.
+
+#### Servicios
+- [`UsersService.create`](file:///Users/nicogarofalo/Documents/Haomai/Haomai-WMS/api/src/modules/users/users.service.ts#L15-L34): Verifica duplicados (username/email), crea usuario en BD.
+- [`AuthService.register`](file:///Users/nicogarofalo/Documents/Haomai/Haomai-WMS/api/src/modules/auth/auth.service.ts#L64-L76): Hashea password y delega creación a `UsersService`.
+
+#### Endpoint
+- `POST /auth/register` en [`AuthController`](file:///Users/nicogarofalo/Documents/Haomai/Haomai-WMS/api/src/modules/auth/auth.controller.ts#L34-L42): Excluye password del response.
+- **Guards**: Comentados temporalmente (JwtAuthGuard, RolesGuard - SUPER_ADMIN). Requieren implementación posterior.
+
+#### Configuración Global
+- [`main.ts`](file:///Users/nicogarofalo/Documents/Haomai/Haomai-WMS/api/src/main.ts#L8-L12): ValidationPipe habilitado globalmente (transform, whitelist, forbidNonWhitelisted).
+
+#### Tests
+- **Unit Tests**: 2 nuevos tests en [`auth.service.spec.ts`](file:///Users/nicogarofalo/Documents/Haomai/Haomai-WMS/api/src/modules/auth/auth.service.spec.ts#L130-L172) (9 total - todos pasan ✓).
+- **E2E Tests**: 2 nuevos tests en [`auth.e2e-spec.ts`](file:///Users/nicogarofalo/Documents/Haomai/Haomai-WMS/api/test/auth.e2e-spec.ts#L47-L73) (4 total - todos pasan ✓).
+
+### Tareas Completadas (BUSINESS-001 → AUTH-002)
+
+1. Eliminación completa de entidad `Business` (Single Tenant).
+2. Implementación TDD de User Registration (Service + Controller).
+3. Validación de datos con `class-validator`.
+4. Exclusión de password en responses.
+
+### Próximos Pasos
+
+1. **AUTH-003**: Implementar `JwtAuthGuard` y `RolesGuard` para proteger `/auth/register`.
+2. **AUTH-004**: CRUD completo de usuarios.
+3. **Módulos WMS**: Iniciar implementación de inventario según diseño en [`stock-management-design.md`](file:///Users/nicogarofalo/Documents/Haomai/Haomai-WMS/docs/stock-management-design.md).
+
+---
+
+## Implementación Final de Guards (AUTH-002 Completado)
+
+### Guards Habilitados
+- [`JwtAuthGuard`](file:///Users/nicogarofalo/Documents/Haomai/Haomai-WMS/api/src/modules/auth/guards/jwt-auth.guard.ts): Verifica token JWT válido.
+- [`RolesGuard`](file:///Users/nicogarofalo/Documents/Haomai/Haomai-WMS/api/src/modules/auth/guards/roles.guard.ts): Verifica que el usuario tenga rol `SUPER_ADMIN`.
+- [`@Roles(UserRole.SUPER_ADMIN)`](file:///Users/nicogarofalo/Documents/Haomai/Haomai-WMS/api/src/modules/auth/decorators/roles.decorator.ts): Decorator aplicado en `/auth/register`.
+
+### Fix Aplicado
+- [`AuthModule`](file:///Users/nicogarofalo/Documents/Haomai/Haomai-WMS/api/src/modules/auth/auth.module.ts#L25): Agregado `JwtStrategy` a providers (faltaba).
+
+### Tests E2E (5/5 ✓)
+- 401 sin autenticación ✓
+- 403 con token de rol diferente a SUPER_ADMIN ✓ 
+- 201 con token de SUPER_ADMIN ✓
+- 400 con datos inválidos (y SUPER_ADMIN) ✓
+
+**AUTH-002 completado siguiendo TDD estrictamente.**

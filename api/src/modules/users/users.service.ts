@@ -12,8 +12,26 @@ export class UsersService {
     private usersRepository: Repository<User>,
   ) { }
 
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+  async create(createUserDto: CreateUserDto): Promise<User> {
+    // Check if username already exists
+    const existingUsername = await this.usersRepository.findOne({
+      where: { username: createUserDto.username },
+    });
+    if (existingUsername) {
+      throw new Error(`Username '${createUserDto.username}' already exists`);
+    }
+
+    // Check if email already exists
+    const existingEmail = await this.usersRepository.findOne({
+      where: { email: createUserDto.email },
+    });
+    if (existingEmail) {
+      throw new Error(`Email '${createUserDto.email}' already exists`);
+    }
+
+    // Create and save the user
+    const user = this.usersRepository.create(createUserDto);
+    return this.usersRepository.save(user);
   }
 
   findAll() {

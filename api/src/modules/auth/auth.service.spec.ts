@@ -127,6 +127,51 @@ describe('AuthService', () => {
         });
     });
 
+    describe('register', () => {
+        it('should create a new user successfully', async () => {
+            const createUserDto = {
+                username: 'newuser',
+                email: 'newuser@example.com',
+                password: 'password123',
+                fullName: 'New User',
+                roleType: UserRole.ADMIN,
+            };
+            const hashedPassword = '$2b$10$hashedpassword';
+            const createdUser = {
+                id: 'new-uuid',
+                ...createUserDto,
+                password: hashedPassword,
+            };
+
+            (bcrypt.hash as jest.Mock).mockResolvedValue(hashedPassword);
+            mockUsersService.create = jest.fn().mockResolvedValue(createdUser);
+
+            const result = await service.register(createUserDto);
+
+            expect(bcrypt.hash).toHaveBeenCalledWith(createUserDto.password, 10);
+            expect(mockUsersService.create).toHaveBeenCalledWith({
+                ...createUserDto,
+                password: hashedPassword,
+            });
+            expect(result).toEqual(createdUser);
+        });
+
+        it('should throw error if user creation fails', async () => {
+            const createUserDto = {
+                username: 'newuser',
+                email: 'newuser@example.com',
+                password: 'password123',
+                fullName: 'New User',
+                roleType: UserRole.ADMIN,
+            };
+
+            (bcrypt.hash as jest.Mock).mockResolvedValue('$2b$10$hashedpassword');
+            mockUsersService.create = jest.fn().mockRejectedValue(new Error('Database error'));
+
+            await expect(service.register(createUserDto)).rejects.toThrow('Database error');
+        });
+    });
+
     describe('hashPassword', () => {
         it('should hash a password using bcrypt', async () => {
             const plainPassword = 'password123';

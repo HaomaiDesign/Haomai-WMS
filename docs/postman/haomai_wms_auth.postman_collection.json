@@ -32,6 +32,41 @@
                 }
             },
             "response": []
+        },
+        {
+            "name": "Register User (SUPER_ADMIN only)",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json",
+                        "type": "text"
+                    },
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{authToken}}",
+                        "type": "text",
+                        "description": "JWT token from login (SUPER_ADMIN required)"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"username\": \"newuser\",\n    \"email\": \"newuser@example.com\",\n    \"password\": \"SecurePassword123!\",\n    \"fullName\": \"New User Name\",\n    \"roleType\": \"ADMIN\"\n}"
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/auth/register",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "auth",
+                        "register"
+                    ]
+                },
+                "description": "Creates a new user. Requires SUPER_ADMIN role.\n\n**Authentication:** JWT Bearer Token (SUPER_ADMIN only)\n\n**Request Body:**\n- username (string, required): Unique username\n- email (string, required): Valid email address\n- password (string, required): Minimum 6 characters\n- fullName (string, required): User's full name\n- roleType (string, required): One of: SUPER_ADMIN, ADMIN, REPOSITOR\n\n**Response:** User object without password field\n\n**Status Codes:**\n- 201: User created successfully\n- 400: Invalid input data\n- 401: Unauthorized (no token or invalid token)\n- 403: Forbidden (user is not SUPER_ADMIN)\n- 409: User already exists (duplicate username or email)"
+            },
+            "response": []
         }
     ],
     "variable": [

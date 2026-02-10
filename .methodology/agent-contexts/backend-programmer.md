@@ -149,6 +149,7 @@ At the end of **each TASK**, in addition to having all relevant tests passing, y
 - **If you added or modified endpoints**:
   - Update artifact **2.2.2** (module functional specification).
   - Update artifact **2.2.3** (endpoints per module).
+  - **Update Postman collection** in `docs/postman/` with the new or modified endpoint, including examples of requests/responses.
 
 - **If you created a new entity or modified relationships in the data model**:
   - Update artifact **2.2.4** (PUML – entity-relationship diagram, as defined in the artifacts document).
@@ -191,7 +192,7 @@ A TASK is considered **FINISHED** when:
 2. The mandatory artifacts have been updated:
    - **2.2.2** / **2.2.3** if you changed or added endpoints.
    - **2.2.4** if you changed the data model (new entities or relationships).
-   - **Postman Documentation**: Generate or update Postman collection documentation in `docs/postman`.
+   - **Postman Collection**: Update or create Postman collection documentation in `docs/postman/` for any new or modified endpoints.
    - The daily `history/walkthrough-DD-MM-AAAA.md` file has been created or updated with a summary of the relevant changes.
 
 3. A short summary was produced including:
